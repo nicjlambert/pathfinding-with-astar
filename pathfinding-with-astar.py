@@ -1,38 +1,16 @@
 from queue import PriorityQueue
+from collections import namedtuple
 
-# Define the heuristic function
 def heuristic(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-def a_star(start, goal, grid):
-    # Initialize priority queue
-    frontier = PriorityQueue()
-    frontier.put(start, 0)
-    came_from = {start: None}
-    cost_so_far = {start: 0}
+def is_valid(grid, pos):
+    return 0 <= pos[0] < len(grid) and 0 <= pos[1] < len(grid[0]) and grid[pos[0]][pos[1]] != 1
 
-    while not frontier.empty():
-        current = frontier.get()
+def get_neighbors(pos):
+    return [(pos[0] + dx, pos[1] + dy) for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]]
 
-        if current == goal:
-            break
-
-        # Iterate through neighbors
-        for dx, dy in [(1,0),(-1,0),(0,1),(0,-1)]:
-            next = (current[0] + dx, current[1] + dy)
-
-            # Skip if outside of the grid or an obstacle
-            if next[0] < 0 or next[0] >= len(grid) or next[1] < 0 or next[1] >= len(grid[0]) or grid[next[0]][next[1]] == 1:
-                continue
-
-            new_cost = cost_so_far[current] + 1
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(goal, next)
-                frontier.put(next, priority)
-                came_from[next] = current
-
-    # Reconstruct the path
+def reconstruct_path(came_from, start, goal):
     path = []
     current = goal
     while current != start:
@@ -41,6 +19,31 @@ def a_star(start, goal, grid):
     path.append(start)
     path.reverse()
     return path
+
+def a_star(start, goal, grid):
+    frontier = PriorityQueue()
+    frontier.put((0, start))
+    came_from = {start: None}
+    cost_so_far = {start: 0}
+
+    while not frontier.empty():
+        _, current = frontier.get()
+
+        if current == goal:
+            break
+
+        for next in get_neighbors(current):
+            if not is_valid(grid, next):
+                continue
+            
+            new_cost = cost_so_far[current] + 1
+            if next not in cost_so_far or new_cost < cost_so_far[next]:
+                cost_so_far[next] = new_cost
+                priority = new_cost + heuristic(goal, next)
+                frontier.put((priority, next))
+                came_from[next] = current
+
+    return reconstruct_path(came_from, start, goal)
 
 # Define the grid (0 is free, 1 is an obstacle)
 grid = [
