@@ -1,7 +1,7 @@
 from queue import PriorityQueue
 from collections import namedtuple
 
-def heuristic(a, b):
+def manhattan_distance(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 def is_valid(grid, pos):
@@ -39,7 +39,7 @@ def a_star(start, goal, grid):
             new_cost = cost_so_far[current] + 1
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(goal, next)
+                priority = new_cost + manhattan_distance(goal, next)
                 frontier.put((priority, next))
                 came_from[next] = current
 
