@@ -56,5 +56,59 @@ grid = [
 
 start = (0, 0)
 goal = (4, 4)
-path = a_star(start, goal, grid)
-print("Path:", path)
+
+def a_star_visualize(start, goal, grid):
+    frontier = PriorityQueue()
+    frontier.put((0, start))
+    came_from = {start: None}
+    cost_so_far = {start: 0}
+    
+    explored = set()
+    all_frontiers = []
+
+    while not frontier.empty():
+        _, current = frontier.get()
+        explored.add(current)
+
+        if current == goal:
+            break
+
+        for next in get_neighbors(current):
+            if not is_valid(grid, next):
+                continue
+
+            new_cost = cost_so_far[current] + 1
+            if next not in cost_so_far or new_cost < cost_so_far[next]:
+                cost_so_far[next] = new_cost
+                priority = new_cost + manhattan_distance(goal, next)
+                frontier.put((priority, next))
+                came_from[next] = current
+
+        all_frontiers.append(list(frontier.queue))
+
+    path = reconstruct_path(came_from, start, goal)
+    return path, explored, all_frontiers
+
+def print_grid(grid, start, goal, path, explored):
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            pos = (i, j)
+            if pos == start:
+                print("S", end=" ")
+            elif pos == goal:
+                print("G", end=" ")
+            elif pos in path:
+                print(".", end=" ")
+            elif pos in explored:
+                print("x", end=" ")
+            else:
+                print(grid[i][j], end=" ")
+        print()
+
+path, explored, all_frontiers = a_star_visualize(start, goal, grid)
+
+print("Initial Grid:")
+print_grid(grid, start, goal, [], [])
+
+print("\nFinal Grid with Path:")
+print_grid(grid, start, goal, path, explored)
