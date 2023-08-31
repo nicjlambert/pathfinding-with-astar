@@ -55,7 +55,7 @@ grid = [
 ]
 
 start = (0, 0)
-goal = (4, 4)
+goal = (4, 2)
 
 def a_star_visualize(start, goal, grid):
     frontier = PriorityQueue()
@@ -90,6 +90,7 @@ def a_star_visualize(start, goal, grid):
     return path, explored, all_frontiers
 
 def print_grid(grid, start, goal, path, explored):
+
     for i in range(len(grid)):
         for j in range(len(grid[0])):
             pos = (i, j)
